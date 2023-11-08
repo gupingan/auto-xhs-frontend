@@ -106,19 +106,19 @@ class CSVLogger:
         self.__init_csv()
 
     def __init_csv(self):
-        with open(self.file_name, mode="w", newline='', encoding='utf-8') as csvfile:
+        with open(self.file_name, mode="w", newline='', encoding='utf-8-sig') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=self.fieldnames)
             writer.writeheader()
 
     def log(self, data: dict, level: str = "info"):
-        with open(self.file_name, mode=self.mode, newline='', encoding='utf-8') as csvfile:
+        with open(self.file_name, mode=self.mode, newline='', encoding='utf-8-sig') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=self.fieldnames)
             data["时间"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             data["级别"] = level
             writer.writerow(data)
 
     def read_csv(self):
-        with open(self.file_name, mode='r', newline='', encoding='utf-8') as csvfile:
+        with open(self.file_name, mode='r', newline='', encoding='utf-8-sig') as csvfile:
             reader = csv.reader(csvfile)
             data = [row for row in reader]
         return data
