@@ -1,6 +1,6 @@
 """
 @File: view.py
-@Author: 秦宇
+@Author: 顾平安
 @Created: 2023/11/5 16:10
 @Description: Created in 咸鱼-自动化-AutoXhs.
 """
@@ -78,18 +78,18 @@ class View:
             (' 3', 'menu', '显示功能的主菜单'),
             (' 4', 'main|home', '同上'),
             (' 5', 'exit|quit', '退出当前输入状态'),
-            (' 6', 'log 爬虫名', '查看对应爬虫的全部日志'),
-            (' ', 'log 爬虫名 [n]', '查看对应爬虫的最新n行日志'),
-            (' 7', 'show 爬虫名', '查看对应爬虫的详细信息和状况'),
-            (' 8', 'urls 爬虫名', '查看对应爬虫的所有笔记信息'),
-            (' ', 'urls 爬虫名 [n]', '查看对应爬虫的前n条笔记信息'),
-            (' ', 'urls 爬虫名 [a] [b]', '查看对应爬虫的从第a到b条笔记信息'),
+            (' 6', 'log 进程名', '查看对应进程的全部日志'),
+            (' ', 'log 进程名 [n]', '查看对应进程的最新n行日志'),
+            (' 7', 'show 进程名', '查看对应进程的详细信息和状况'),
+            (' 8', 'urls 进程名', '查看对应进程的所有笔记信息'),
+            (' ', 'urls 进程名 [n]', '查看对应进程的前n条笔记信息'),
+            (' ', 'urls 进程名 [a] [b]', '查看对应进程的从第a到b条笔记信息'),
         ]
         printc('帮助：', BLUE)
         print('\t操作十分简单，注意看提示')
         print('\t注意输入指令/命令之后系统所反馈的信息')
         printc('[1] 快速入门：', GREEN)
-        print('\t修改配置 > 添加爬虫 > 操作爬虫(去激活)')
+        print('\t修改配置 > 添加进程 > 操作进程(去激活)')
         printc('[2] 指令：', GREEN)
         print(tabulate(commands, tablefmt='plain'))
 
@@ -118,9 +118,9 @@ class View:
     def menu(self):
         printc('菜  单'.center(25), BRIGHT_CYAN)
         menu_data = [
-            ["1 修改配置", "2 添加爬虫"],
-            ["3 查看爬虫", "4 操作爬虫"],
-            ["5 修改爬虫", "6 浏览日志"],
+            ["1 修改配置", "2 添加进程"],
+            ["3 查看进程", "4 操作进程"],
+            ["5 修改进程", "6 浏览日志"],
             ["7 用户信息", "q 退出程序"]
         ]
         print(tabulate(menu_data, tablefmt='fancy_grid'))
@@ -173,13 +173,13 @@ class View:
         headers = ('序号', '名字', '状态', '成功评论', '失败评论', '已完成')
         print(tabulate(spiders, headers=headers, showindex=True, tablefmt="fancy_grid"))
         printc('提示：', BLUE, end='')
-        print('你可以使用命令`show 名字`查看指定爬虫的更详细资料')
+        print('你可以使用命令`show 名字`查看指定进程的更详细资料')
 
     def log_help(self):
         printc('系统：', BLUE, end='')
-        print('命令格式为 [爬虫名] [指定最新数量（不写默认全部）]')
-        print('      示例：10086 表示爬虫10086的所有日志')
-        print('      示例：10086 10 表示爬虫10086的最新10条日志')
+        print('命令格式为 [进程名] [指定最新数量（不写默认全部）]')
+        print('      示例：10086 表示进程10086的所有日志')
+        print('      示例：10086 10 表示进程10086的最新10条日志')
 
     def get_spider_info(self, spider):
         return [
@@ -215,13 +215,13 @@ class View:
         printc('【3】简述：', BRIGHT_CYAN, end='')
         if spider.noteType == '先图文后视频':
             print(
-                f'爬虫 {spider.name} 由用户 {spider.user.username} 在 {spider.create_time} 创建，该爬虫搜索的目标'
+                f'进程 {spider.name} 由用户 {spider.user.username} 在 {spider.create_time} 创建，该进程搜索的目标'
                 f'先是排序{spider.sortType}的与{spider.searchKey.replace("|", "、")}相关的图文笔记，然后就是视频笔记，'
                 f'总任务量是{spider.taskCount}个，需要{"点赞、" if spider.isLike else ""}{"关注、" if spider.isFollow else ""}'
                 f'{"收藏、" if spider.isCollect else ""}{"评论，" if spider.isComment else ""}' + saySkipCollect + sayAgainCommentCollect)
         else:
             print(
-                f'爬虫 {spider.name} 由用户 {spider.user.username} 在 {spider.create_time} 创建，该爬虫搜索的目标'
+                f'进程 {spider.name} 由用户 {spider.user.username} 在 {spider.create_time} 创建，该进程搜索的目标'
                 f'是排序{spider.sortType}的与{spider.searchKey.replace("|", "、")}相关的{spider.noteType}笔记，'
                 f'总任务量是{spider.taskCount}个，需要{"点赞、" if spider.isLike else ""}{"关注、" if spider.isFollow else ""}'
                 f'{"收藏、" if spider.isCollect else ""}、{"评论，" if spider.isComment else ""}' + saySkipCollect + sayAgainCommentCollect)

@@ -1,6 +1,6 @@
 """
 @File: model.py
-@Author: 秦宇
+@Author: 顾平安
 @Created: 2023/11/5 16:10
 @Description: Created in 咸鱼-自动化-AutoXhs.
 """
@@ -335,21 +335,21 @@ class Spider(threading.Thread):
 
     def run(self):
         self.state = 'running'
-        self.logger.log({"信息": "爬虫已经激活，开始运行"})
+        self.logger.log({"信息": "进程已经激活，开始运行"})
         self.execute()
-        self.logger.log({"信息": "爬虫已经运行完毕"})
+        self.logger.log({"信息": "进程已经运行完毕"})
         self.state = 'stopped'
 
     def execute(self):
         if not self.tasks:
-            return self.logger.log({"信息": "爬虫未部署任务，退出中..."})
+            return self.logger.log({"信息": "进程未部署任务，退出中..."})
         for i in range(0, len(self.tasks) - 1):
             self.tasks[i].setNext(self.tasks[i + 1])
         if self.tasks:
             self.tasks[-1].setNext(None)
         self.searcher.run()
         if not self.searcher.urls:
-            return self.logger.log({"信息": "爬虫未发现有效链接，退出中..."})
+            return self.logger.log({"信息": "进程无有效链接，退出中..."})
         i = 0
         while not self.stop_event.is_set():
             self.pause_event.wait()
@@ -414,7 +414,7 @@ class Searcher:
             response = self.api.post(f'{self.settings.baseAPI}/note/search', data)
             noteIds = map(lambda x: x['noteId'], self.urls)
             for note in response['data']:
-                if note['id'] not in noteIds:
+                if note['noteId'] not in noteIds:
                     self.urls.append(note)
             self.spider.taskCount = len(self.urls)
         except Exception as e:

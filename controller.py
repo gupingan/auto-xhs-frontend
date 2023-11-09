@@ -1,6 +1,6 @@
 """
 @File: controller.py
-@Author: 秦宇
+@Author: 顾平安
 @Created: 2023/11/5 16:10
 @Description: Created in 咸鱼-自动化-AutoXhs.
 """
@@ -156,7 +156,7 @@ class Controller:
             elif option.isdigit() and 0 <= int(option) < length:
                 option = int(option)
                 print(f'当前配置项为：{config_items[option][2]}, 输入n/N或回车放弃修改')
-                value = inputc(f'[{self.user.username}/爬虫配置]({config_items[option][3]})$ ')
+                value = inputc(f'[{self.user.username}/进程配置]({config_items[option][3]})$ ')
                 if not value or value.lower() == 'n':
                     continue
                 elif option in (0, 5, 7, 8, 9, 10, 11, 12, 13, 15, 16, 19):
@@ -247,10 +247,10 @@ class Controller:
         if not self.user.settings.check():
             return
         printc('系统：', BLUE, end='')
-        print('你确定要创建爬虫吗？请输入 y 准备扫码')
+        print('你确定要创建进程吗？请输入 y 准备扫码')
         if 'y' != inputc(f'[{self.user.username}](y|N)$ ').lower():
             printc('系统：', BLUE, end='')
-            return print('已经取消创建爬虫操作')
+            return print('已经取消创建进程操作')
         qrcode = QrCode(self.user)
         url, qr_id, code = qrcode.get_info()
         if not (url and qr_id and code):
@@ -274,12 +274,12 @@ class Controller:
         print('扫码登录成功，可以关闭二维码')
         cookies = Cookies().update_cookie('web_session', data['session'])
         printc('系统：', BLUE, end='')
-        print('请为爬虫命名(推荐使用数字)，方便后续激活、暂停等操作')
+        print('请为进程命名(推荐使用数字)，方便后续激活、暂停等操作')
         while True:
-            spider_name = inputc(f'[{self.user.username}/添加爬虫](回车或N/n取消)$ ')
+            spider_name = inputc(f'[{self.user.username}/添加进程](回车或N/n取消)$ ')
             if not spider_name or spider_name.lower() in ('n', 'q', 'quit', 'exit'): return
             if spider_name in Spiders.keys():
-                printc(f'系统：爬虫 {spider_name} 已存在，请重新命名', RED)
+                printc(f'系统：进程 {spider_name} 已存在，请重新命名', RED)
                 continue
             if spider_name in self.user.settings.buildWords:
                 printc(f'系统：名字 {spider_name} 属于内置关键字，不可使用', RED)
@@ -314,12 +314,12 @@ class Controller:
         }
         response = spider.api.post(f"{self.user.settings.baseURL}{create_api}", data=post_data)
         if not response['success']:
-            return printc(f'系统：创建爬虫失败 {response["msg"]}', RED)
+            return printc(f'系统：创建进程失败 {response["msg"]}', RED)
         # 送进总字典中
         Spiders[spider_name] = spider
         printc('系统：', BLUE, end='')
-        print(f'{response["msg"]} 是否激活爬虫？(默认不激活)')
-        is_activate = inputc(f'[{self.user.username}/添加爬虫](y|N)$ ')
+        print(f'{response["msg"]} 是否激活进程？(默认不激活)')
+        is_activate = inputc(f'[{self.user.username}/添加进程](y|N)$ ')
         if is_activate.lower() == 'y':
             spider.start()
 
@@ -330,13 +330,13 @@ class Controller:
             self.view.show_spiders(spiders)
         else:
             printc('系统：', BLUE, end='')
-            print('还没有创建任何爬虫')
+            print('还没有创建任何进程')
 
     def operate_spider(self):
         printc('系统：', BLUE, end='')
-        print('请输入爬虫名称进行选择，输入q或者回车返回上一级')
+        print('请输入进程名称进行选择，输入q或者回车返回上一级')
         while True:
-            spider_name = inputc(f'[{self.user.username}/操作爬虫]$ ')
+            spider_name = inputc(f'[{self.user.username}/操作进程]$ ')
             if not spider_name or spider_name.lower() in ('q', 'exit', 'quit'):
                 self.clear(self.view.menu)
                 break
@@ -344,33 +344,33 @@ class Controller:
                 printc('系统：', BLUE, end='')
                 print('请用户输入操作序号，回车/q/0可取消')
                 print('操作序号：1 激活 | 2 暂停 | 3 恢复 | 4 终止 | 5 删除')
-                operate = inputc(f'[{self.user.username}/操作爬虫](选择操作)$ ')
+                operate = inputc(f'[{self.user.username}/操作进程](选择操作)$ ')
                 if not operate or operate in ('0', 'q'):
                     printc('系统：', BLUE, end='')
-                    print(f'用户已取消对爬虫 {spider_name} 操作')
+                    print(f'用户已取消对进程 {spider_name} 操作')
                     continue
                 elif operate == '1':
                     if spider.state in ('running', 'paused'):
-                        return printc(f'系统：爬虫 {spider_name} 已激活过了，不可再激活', RED)
+                        return printc(f'系统：进程 {spider_name} 已激活过了，不可再激活', RED)
                     spider.start()
                 elif operate == '2':
                     if spider.state in ('stopped', 'paused'):
-                        return printc(f'系统：爬虫 {spider_name} 已经暂停或者已经终止，不可再暂停', RED)
+                        return printc(f'系统：进程 {spider_name} 已经暂停或者已经终止，不可再暂停', RED)
                     spider.pause()
                 elif operate == '3':
                     if spider.state in ('running', 'stopped'):
-                        return printc(f'系统：爬虫 {spider_name} 正在运行或者已经终止，不可再恢复', RED)
+                        return printc(f'系统：进程 {spider_name} 正在运行或者已经终止，不可再恢复', RED)
                     spider.resume()
                 elif operate == '4':
                     if spider.state == 'stopped':
-                        return printc(f'系统：爬虫 {spider_name} 已经终止，不可再终止', RED)
+                        return printc(f'系统：进程 {spider_name} 已经终止，不可再终止', RED)
                     spider.stop()
                 elif operate == '5':
                     if spider.state != 'stopped':
                         spider.stop()
                     del Spiders[spider_name]
                     printc('系统：', BLUE, end='')
-                    return printc(f'爬虫 {spider_name} 被移除', YELLOW)
+                    return printc(f'进程 {spider_name} 被移除', YELLOW)
                 spiders = [(spider.name, states[spider.state], spider.success_count, spider.failure_count,
                             spider.finished_count)]
                 self.view.show_spiders(spiders)
@@ -395,10 +395,10 @@ class Controller:
                     if spider := Spiders.get(operate[1]):
                         self.view.show_spider_urls(spider, start=int(operate[2]) - 1, end=int(operate[3]) + 1)
             else:
-                command = self.commands.get(spider_name, lambda: printc(f'系统：爬虫 {spider_name} 不存在', RED))
+                command = self.commands.get(spider_name, lambda: printc(f'系统：进程 {spider_name} 不存在', RED))
                 if command == self.clear:
                     printc('系统：', BLUE, end='')
-                    self.clear(lambda: print('请输入爬虫名称进行选择，输入q或者回车返回上一级'))
+                    self.clear(lambda: print('请输入进程名称进行选择，输入q或者回车返回上一级'))
                 else:
                     command()
 
@@ -407,7 +407,7 @@ class Controller:
         log_command = inputc(f'[{self.user.username}/浏览日志]$ ').strip().split(' ')
         if 0 < len(log_command) < 3:
             if log_command[0] not in Spiders.keys():
-                return printc(f'系统：爬虫 {log_command[0]} 不存在', RED)
+                return printc(f'系统：进程 {log_command[0]} 不存在', RED)
             spider = Spiders[log_command[0]]
             if len(log_command) == 1:
                 spider.logger.display()
@@ -421,7 +421,7 @@ class Controller:
 
     def find_log(self, spider_name, last_n: str = None):
         if spider_name not in Spiders.keys():
-            return printc(f'系统：爬虫 {spider_name} 不存在', RED)
+            return printc(f'系统：进程 {spider_name} 不存在', RED)
         spider = Spiders[spider_name]
         if last_n:
             if last_n.isdigit():
