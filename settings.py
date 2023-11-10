@@ -5,13 +5,11 @@ from pathlib import Path
 class Settings:
     def __init__(self, defaults=None, filename='settings.ini'):
         self.gpaKey = '&71)26eb3h5j%6n*fk9%w*zvimf0ccl-2p9$ifo()n$pq!xyu9'
-        self.version_number = 2
-        self.version = '2.1 alpha'
-        self.baseAPI = "http://127.0.0.1:5000/api"
-        self.baseURL = "http://127.0.0.1:5000"
+        self.version_number = 4
+        self.version = '2.2'
         self.xhsBaseURL = "https://www.xiaohongshu.com/explore/"
         self.buildWords = ('clear', 'cls', 'menu', 'main', 'home', 'exit',
-                           'quit', 'log', 'show', 'urls')
+                           'quit', 'log', 'show', 'note')
         self.config = configparser.ConfigParser(defaults=defaults)
         self.home = Path.home()
         self.ini_file = Path(filename)
@@ -42,6 +40,7 @@ class Settings:
             'task-count': '200',
             'cyclic-mode': 'True',
             'interval-minute': '30',
+            'cyclic-search-count': '20',
         }
         self.config['TaskConfig'] = {
             'is-like': 'False',
@@ -90,6 +89,9 @@ class Settings:
         if not (2 <= int(self.get('SearchConfig', 'interval-minute')) <= 999):
             print('系统：循环间隔分钟数只能设置在[2-999]之间')
             return False
+        if not (20 <= int(self.get('SearchConfig', 'cyclic-search-count')) <= 200):
+            print('系统：每次循环的搜索数量只能设置在[20-200]之间')
+            return False
         if not (1 <= int(self.get('TaskConfig', 'rare-word-count')) <= 99):
             print('系统：生僻字数量只能设置在[1-99]之间')
             return False
@@ -119,10 +121,3 @@ class Settings:
         for section, section_v in self.config.items():
             for k, v in section_v.items():
                 print(f"self.settings.get(\"{section}\", \"{k}\")")
-
-
-if __name__ == '__main__':
-    s = Settings()
-    s.print_set()
-    print()
-    s.print_get()
