@@ -1,7 +1,6 @@
 import json
 from view import *
 from .auth import getGPASign
-import matplotlib.pyplot as plt
 
 
 class Controller:

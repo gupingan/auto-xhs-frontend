@@ -1,10 +1,5 @@
-"""
-@File: api.py
-@Author: 顾平安
-@Created: 2023/11/9 15:18
-@Description: Created in frontend.
-"""
 import requests
+
 
 class API:
     def __init__(self, token, cookies=''):

@@ -1,9 +1,3 @@
-"""
-@File: colors.py
-@Author: 顾平安
-@Created: 2023/11/9 16:24
-@Description: Created in frontend.
-"""
 # 前景色
 BLACK = "\033[30m"
 RED = "\033[31m"

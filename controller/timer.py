@@ -1,9 +1,3 @@
-"""
-@File: timer.py
-@Author: 顾平安
-@Created: 2023/11/9 16:36
-@Description: Created in frontend.
-"""
 from datetime import datetime
 
 
