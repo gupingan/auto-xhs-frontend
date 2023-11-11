@@ -1,6 +1,7 @@
 import json
 from view import *
 from .auth import getGPASign
+from .timer import *
 
 
 class Controller:
@@ -32,6 +33,15 @@ class Controller:
             return False, '当前无法登录，请检查网络服务'
         except Exception as e:
             return False, f'当前无法登录，{e}'
+
+    def request_ip(self):
+        try:
+            response = requests.get(url=f'{BaseAPI}/user/locate', headers={
+                'Authorization': f'Bearer {self.user.token}',
+            })
+            return response.json()['data']['ip']
+        except Exception as e:
+            return f'error: {e}'
 
     def get_max_limit(self):
         try:
@@ -66,6 +76,8 @@ class Controller:
         if not (logs_folder := Path(f'./日志-{uname}/')).exists():
             logs_folder.mkdir()
         self.user.setUser(uname, upwd)
+        self.user.setIP(self.request_ip())
+        self.user.setTime(current('str'))
         self.user.setLimit(self.get_max_limit())
         self.user.bind(Settings())
         self.main()
@@ -232,37 +244,36 @@ class Controller:
             return False
         printc('系统：', BLUE, end='')
         print('请在5分钟内使用手机扫描二维码')
-        time.sleep(1)
         self.qrcodeViewer.url(url)
         self.qrcodeViewer.show()
-        while True:
-            success, msg, data = request_qrcode.state(qr_id, code)
-            if not success:
-                if msg == '二维码已过期':
-                    return printc('系统：扫码登录失败，二维码过期', RED)
-                time.sleep(3)
-                continue
-            if success and msg == '登录成功':
-                break
+        time.sleep(1)
+        printc('系统：', BLUE, end='')
+        print('扫码并允许登录后，请输入 y 确认')
+        if 'y' != inputc(f'[{self.user.username}](y|N)$ ').lower():
+            printc('系统：', BLUE, end='')
+            print('已经取消创建进程操作')
+            return False, None, None
+        success, msg, data = request_qrcode.state(qr_id, code)
+        if not success:
+            printc(f'系统：扫码登录失败，{msg}', RED)
+            return False, None, None
+        if success and msg != '登录成功':
+            printc(f'系统：扫码登录失败，{msg}', RED)
+            return False, None, None
         user_id = data['user_id']
         session = data['session']
-        printc('系统：', BLUE, end='')
-        print(f'登录成功，请手动关闭二维码')
-        return user_id, session
+        return True, user_id, session
 
     def add_spider(self):
         self.user.settings.update()
         if not self.user.settings.check():
             return
-        printc('系统：', BLUE, end='')
-        print('你确定要创建进程吗？请输入 y 准备扫码')
-        if 'y' != inputc(f'[{self.user.username}](y|N)$ ').lower():
-            printc('系统：', BLUE, end='')
-            return print('已经取消创建进程操作')
-        user_id, session = self.create_qrcode()
+        state, user_id, session = self.create_qrcode()
+        if not state:
+            return
         cookies_obj = Cookies().update_cookie('web_session', session)
         printc('系统：', BLUE, end='')
-        print('请为进程命名(推荐使用数字)，方便后续激活、暂停等操作')
+        print('登录成功，请为进程命名(推荐使用数字)，方便后续激活、暂停等操作')
         while True:
             spider_name = inputc(f'[{self.user.username}/添加进程](回车取消)$ ')
             if not spider_name or spider_name.lower() in ('n', 'q', 'quit', 'exit'):
@@ -298,7 +309,7 @@ class Controller:
         gpa_s, gpa_t = getGPASign(self.user.settings.gpaKey, create_api)
         post_data = {
             'count': len(Spiders),
-            'info': json.dumps(dict(spider)),
+            'info': json.dumps(dict(spider), ensure_ascii=False),
             'gpa_s': gpa_s,
             'gpa_t': gpa_t,
         }

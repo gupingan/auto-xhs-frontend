@@ -61,9 +61,10 @@ class View:
         print(tabulate(menu_data, tablefmt='fancy_grid'))
 
     def show_app_info(self, user, used_limit):
-        printc('应用信息'.center(32), BRIGHT_CYAN)
+        printc('应用信息'.center(42), BRIGHT_CYAN)
         user_data = [
             ["用户名", user.username, '额度', f'{used_limit} / {user.max_limit}'],
+            ['IP地址', user.ip, '登陆时间', user.login_time],
             ['版本', f'auto-xhs v{self.settings.version}', "版本号", self.settings.version_number],
         ]
         print(tabulate(user_data, tablefmt='plain'))

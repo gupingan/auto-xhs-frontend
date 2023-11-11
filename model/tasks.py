@@ -82,8 +82,10 @@ class Handler:
                 result = func(self, spider, *args, **kwargs)
                 self.pause(spider)
                 return result
-            except requests.RequestException:
-                spider.logger.log({"信息": f'请求异常，{func.__name__}', '笔记编号': noteId}, level='failure')
+            except requests.Timeout as e:
+                spider.logger.log({"信息": f'请求超时，{func.__name__}: {e}', '笔记编号': noteId}, level='warning')
+            except requests.ConnectionError as e:
+                spider.logger.log({"信息": f'连接异常，{func.__name__}: {e}', '笔记编号': noteId}, level='failure')
                 self.next = None
                 spider.stop()
             except Exception as e:

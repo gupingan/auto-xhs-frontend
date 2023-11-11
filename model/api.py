@@ -15,6 +15,6 @@ class API:
             response = requests.get(url, headers=self.headers).json()
         return response
 
-    def post(self, url, data):
-        response = requests.post(url=url, data=data, headers=self.headers).json()
+    def post(self, url, data=None, json=None):
+        response = requests.post(url=url, data=data, json=json, headers=self.headers).json()
         return response

@@ -65,7 +65,7 @@ class Spider(threading.Thread):
     def __iter__(self):
         yield '名称', self.name
         yield '小红书编号', self.userId
-        yield '搜索词', self.searchKey.split('|')
+        yield '搜索词', self.searchKey
         yield '笔记类型', self.noteType
         yield '排序类型', self.sortType
         yield '循环模式', '开启' if self.cyclicMode else '关闭'
@@ -79,7 +79,7 @@ class Spider(threading.Thread):
         else:
             comments = ''
         yield '评论文件路径', self.commentPath
-        yield '评论素材', comments.split('\n')
+        yield '评论素材', comments
         yield '总任务量', self.taskCount
         yield 'session', self.session
         yield '是否点赞', '开启' if self.isLike else '关闭'
