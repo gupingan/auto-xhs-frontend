@@ -7,8 +7,9 @@ from .api import API
 from .user import User
 from .logger import CSVLogger
 
-BaseAPI = "http://127.0.0.1:5000/api"
-BaseURL = "http://127.0.0.1:5000"
+Host = '127.0.0.1'
+BaseAPI = f"http://{Host}:5000/api"
+BaseURL = f"http://{Host}:5000"
 
 
 class Spider(threading.Thread):
