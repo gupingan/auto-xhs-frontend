@@ -246,7 +246,6 @@ class Controller:
         print('请在5分钟内使用手机扫描二维码')
         self.qrcodeViewer.url(url)
         self.qrcodeViewer.show()
-        time.sleep(1)
         printc('系统：', BLUE, end='')
         print('扫码并允许登录后，请输入 y 确认')
         if 'y' != inputc(f'[{self.user.username}](y|N)$ ').lower():
@@ -265,64 +264,72 @@ class Controller:
         return True, user_id, session
 
     def add_spider(self):
-        self.user.settings.update()
-        if not self.user.settings.check():
-            return
-        state, user_id, session = self.create_qrcode()
-        if not state:
-            return
-        cookies_obj = Cookies().update_cookie('web_session', session)
-        printc('系统：', BLUE, end='')
-        print('登录成功，请为进程命名(推荐使用数字)，方便后续激活、暂停等操作')
-        while True:
-            spider_name = inputc(f'[{self.user.username}/添加进程](回车取消)$ ')
-            if not spider_name or spider_name.lower() in ('n', 'q', 'quit', 'exit'):
-                printc('系统：', BLUE, end='')
-                return print('用户自行打断了进程创建的过程')
-            if spider_name in Spiders.keys():
-                printc(f'系统：进程 {spider_name} 已存在，请重新命名', RED)
-                continue
-            if spider_name in self.user.settings.buildWords:
-                printc(f'系统：名字 {spider_name} 属于内置关键字，不可使用', RED)
-                continue
-            if (spider_name not in Spiders.keys()) and (spider_name not in self.commands.keys()):
-                break
-        spider = Spider(spider_name, self.user, user_id)
-        spider.source(cookies_obj)
-        # 安排自动化任务
-        if spider.isComment and spider.isAgainCommentCollect:
-            spider.append_task(UncollectTask())
-        if spider.isComment and spider.isSkipCollect:
-            spider.append_task(SkipCollectedTask())
-        if spider.isComment:
-            spider.append_task(CommentTask())
-        if spider.isCollect or (spider.isComment and spider.isSkipCollect):
-            spider.append_task(CollectTask())
-        if spider.isLike:
-            spider.append_task(LikeTask())
-        if spider.isFollow:
-            spider.append_task(FollowTask())
-        if len(spider.tasks):
-            spider.tasks.append(EndTask())
-        # 送进服务器
-        create_api = '/api/spider'
-        gpa_s, gpa_t = getGPASign(self.user.settings.gpaKey, create_api)
-        post_data = {
-            'count': len(Spiders),
-            'info': json.dumps(dict(spider), ensure_ascii=False),
-            'gpa_s': gpa_s,
-            'gpa_t': gpa_t,
-        }
-        response = spider.api.post(f"{BaseURL}{create_api}", data=post_data)
-        if not response['success']:
-            return printc(f'系统：创建进程失败 {response["msg"]}', RED)
-        # 送进总字典中
-        Spiders[spider_name] = spider
-        printc('系统：', BLUE, end='')
-        print(f'{response["msg"]} 是否激活进程？(默认不激活)')
-        is_activate = inputc(f'[{self.user.username}/添加进程](y|N)$ ')
-        if is_activate.lower() == 'y':
-            spider.start()
+        """
+        创建进程方法
+        11月14日：不再使用主入口的异常处理，防止程序退出，而是用方法内的try-except进行处理
+        :return:
+        """
+        try:
+            self.user.settings.update()
+            if not self.user.settings.check():
+                return
+            state, user_id, session = self.create_qrcode()
+            if not state:
+                return
+            cookies_obj = Cookies().update_cookie('web_session', session)
+            printc('系统：', BLUE, end='')
+            print('登录成功，请为进程命名(推荐使用数字)，方便后续激活、暂停等操作')
+            while True:
+                spider_name = inputc(f'[{self.user.username}/添加进程](回车取消)$ ')
+                if not spider_name or spider_name.lower() in ('n', 'q', 'quit', 'exit'):
+                    printc('系统：', BLUE, end='')
+                    return print('用户自行打断了进程创建的过程')
+                if spider_name in Spiders.keys():
+                    printc(f'系统：进程 {spider_name} 已存在，请重新命名', RED)
+                    continue
+                if spider_name in self.user.settings.buildWords:
+                    printc(f'系统：名字 {spider_name} 属于内置关键字，不可使用', RED)
+                    continue
+                if (spider_name not in Spiders.keys()) and (spider_name not in self.commands.keys()):
+                    break
+            spider = Spider(spider_name, self.user, user_id)
+            spider.source(cookies_obj)
+            # 安排自动化任务
+            if spider.isComment and spider.isAgainCommentCollect:
+                spider.append_task(UncollectTask())
+            if spider.isComment and spider.isSkipCollect:
+                spider.append_task(SkipCollectedTask())
+            if spider.isComment:
+                spider.append_task(CommentTask())
+            if spider.isCollect or (spider.isComment and spider.isSkipCollect):
+                spider.append_task(CollectTask())
+            if spider.isLike:
+                spider.append_task(LikeTask())
+            if spider.isFollow:
+                spider.append_task(FollowTask())
+            if len(spider.tasks):
+                spider.tasks.append(EndTask())
+            # 送进服务器
+            create_api = '/api/spider'
+            gpa_s, gpa_t = getGPASign(self.user.settings.gpaKey, create_api)
+            post_data = {
+                'count': len(Spiders),
+                'info': json.dumps(dict(spider), ensure_ascii=False),
+                'gpa_s': gpa_s,
+                'gpa_t': gpa_t,
+            }
+            response = spider.api.post(f"{BaseURL}{create_api}", data=post_data)
+            if not response['success']:
+                return printc(f'系统：创建进程失败 {response["msg"]}', RED)
+            # 送进总字典中
+            Spiders[spider_name] = spider
+            printc('系统：', BLUE, end='')
+            print(f'{response["msg"]} 是否激活进程？(默认不激活)')
+            is_activate = inputc(f'[{self.user.username}/添加进程](y|N)$ ')
+            if is_activate.lower() == 'y':
+                spider.start()
+        except Exception as e:
+            printc(f'系统：创建进程失败，原因 {e}', RED)
 
     def show_spiders(self):
         spiders = [(name, RunStates[spider.state], spider.success_count, spider.failure_count, spider.finished_count)

@@ -72,6 +72,10 @@ BannedWords = ('王', '江', '周', '胡', '刘', '李', '吴', '毛', '温', '�
 
 
 class Handler:
+    """
+    任务链单元基类
+    11月14日：连接遭遇异常时，会优先重试3次，如果全部失败，则执行下一个单元
+    """
     @staticmethod
     def trace(func):
         @functools.wraps(func)
@@ -85,9 +89,7 @@ class Handler:
             except requests.Timeout as e:
                 spider.logger.log({"信息": f'请求超时，{func.__name__}: {e}', '笔记编号': noteId}, level='warning')
             except requests.ConnectionError as e:
-                spider.logger.log({"信息": f'连接异常，{func.__name__}: {e}', '笔记编号': noteId}, level='failure')
-                self.next = None
-                spider.stop()
+                spider.logger.log({"信息": f'连接异常，{func.__name__}: {e}', '笔记编号': noteId}, level='warning')
             except Exception as e:
                 spider.logger.log({"信息": f'链异常，{func.__name__}: {e}', '笔记编号': noteId}, level='warning')
             finally:

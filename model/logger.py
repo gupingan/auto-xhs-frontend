@@ -17,9 +17,17 @@ class CSVLogger:
         self._stop_event = threading.Event()
 
     def __init_csv(self):
-        with open(self.file_name, mode="w", newline='', encoding='utf-8-sig') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=self.fieldnames)
-            writer.writeheader()
+        """
+        Initialize the csv file
+        11月14日 增加对文件权限的检测
+        :return:
+        """
+        try:
+            with open(self.file_name, mode="w", newline='', encoding='utf-8-sig') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=self.fieldnames)
+                writer.writeheader()
+        except PermissionError:
+            print(f"PermissionError:请关闭已打开的CSV文件-{self.file_name}", RED)
 
     def log(self, data: dict, level: str = "info"):
         with open(self.file_name, mode=self.mode, newline='', encoding='utf-8-sig') as csvfile:
