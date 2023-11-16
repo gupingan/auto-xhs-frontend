@@ -11,4 +11,5 @@ if __name__ == '__main__':
         controller = Controller()
         controller.run()
     except Exception as e:
-        print('发生了一些小错误哦！', e)
+        print('抛出异常：', e)
+        input('按任意键退出...')

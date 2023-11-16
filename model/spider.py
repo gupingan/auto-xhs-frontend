@@ -29,8 +29,7 @@ class Spider(threading.Thread):
         self.user = user
         self.api = API(self.user.token)
         self.logger_path = Path(f"./日志-{self.user.username}/{self.name}.csv")
-        fieldnames = ["时间", "级别", '笔记编号', "信息"]
-        self.logger = CSVLogger(str(self.logger_path), fieldnames)
+        self.logger = CSVLogger(str(self.logger_path), ["时间", "级别", '笔记编号', "信息"])
         self.searcher = None
         self.session = None
         self.cookies = None
@@ -51,12 +50,15 @@ class Spider(threading.Thread):
         self.isAgainCommentCollect = self.user.settings.get('TaskConfig', 'is-again-comment-collect')
         self.isRandomRareWord = self.user.settings.get('TaskConfig', 'is-random-rare-word')
         self.rareWordCount = int(self.user.settings.get('TaskConfig', 'rare-word-count'))
+        self.rareWordEngine = self.user.settings.get('TaskConfig', 'rare-word-engine')
         self.isCheckShield = self.user.settings.get('TaskConfig', 'is-check-shield')
         self.isShieldRetry = self.user.settings.get('TaskConfig', 'is-shield-retry')
         self.retryCount = int(self.user.settings.get('TaskConfig', 'retry-count'))
         self.isRandomIntervalTime = self.user.settings.get('TimeConfig', 'is-random-interval-time')
         self.intervalTime = int(self.user.settings.get('TimeConfig', 'task-interval-time'))
         self.commentPath = self.user.settings.get('TimeConfig', 'comment-path')
+        with open(self.commentPath, 'r', encoding='utf8') as fr:
+            self.comments = fr.read().split('\n')
         # 爬虫初始化
         self.daemon = True
         self.pause_event = threading.Event()
@@ -70,17 +72,12 @@ class Spider(threading.Thread):
         yield '笔记类型', self.noteType
         yield '排序类型', self.sortType
         yield '循环模式', '开启' if self.cyclicMode else '关闭'
-        yield '生僻字引擎', f'GPA-Append {self.rareWordCount} {"开启" if self.isRandomRareWord else "关闭"}'
+        yield '生僻字模式', f'{self.rareWordEngine} {self.rareWordCount} {"开启" if self.isRandomRareWord else "关闭"}'
         yield '检查屏蔽', '开启' if self.isCheckShield else '关闭'
-        yield '屏蔽重试', f'开启(最多{self.retryCount}次)' if self.isShieldRetry else '关闭'
+        yield '屏蔽后重试', f'开启(最多{self.retryCount}次)' if self.isShieldRetry else '关闭'
         yield '日志文件路径', str(self.logger_path.absolute())
-        if Path(self.commentPath).exists():
-            with open(self.commentPath, 'r', encoding='utf8') as fr:
-                comments = fr.read()
-        else:
-            comments = ''
         yield '评论文件路径', self.commentPath
-        yield '评论素材', comments
+        yield '评论素材', self.comments
         yield '总任务量', self.taskCount
         yield 'session', self.session
         yield '是否点赞', '开启' if self.isLike else '关闭'

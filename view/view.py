@@ -1,3 +1,4 @@
+import re
 import getpass
 from model import *
 
@@ -88,6 +89,7 @@ class View:
             ("TaskConfig", "is-again-comment-collect", "再评论再收藏", "0 关闭|1 开启"),
             ("TaskConfig", "is-random-rare-word", "是否随机生僻字", "0 关闭|1 开启"),
             ("TaskConfig", "rare-word-count", "生僻字数量", "输入整数"),
+            ("TaskConfig", "rare-word-engine", "生僻字模式", "0 append|1 insert|2 unison|3 non-cn"),
             ("TaskConfig", "is-check-shield", "是否检查屏蔽", "0 关闭|1 开启"),
             ("TaskConfig", "is-shield-retry", "是否屏蔽后重试", "0 关闭|1 开启"),
             ("TaskConfig", "retry-count", "重试次数", "输入整数"),
@@ -126,11 +128,11 @@ class View:
     def get_spider_info(self, spider):
         return [
             ('名称', spider.name, '状态', RunStates[spider.state]),
-            ('小红书编号', spider.userId, '生僻字引擎',
-             f'GPA-Append {spider.rareWordCount} {"开启" if spider.isRandomRareWord else "关闭"}'),
+            ('小红书编号', spider.userId, '生僻字模式',
+             f'{spider.rareWordEngine} {spider.rareWordCount} {"开启" if spider.isRandomRareWord else "关闭"}'),
             ('搜索词', spider.searchKey.replace('|', '、'), '循环模式',
              f'开启 每隔{spider.intervalMinute}分钟搜寻{spider.cyclicSearchCount}条' if spider.cyclicMode else '关闭'),
-            ('检查屏蔽', '开启' if spider.isCheckShield else '关闭', '屏蔽重试',
+            ('检查屏蔽', '开启' if spider.isCheckShield else '关闭', '屏蔽后重试',
              f'开启(最多{spider.retryCount}次)' if spider.isShieldRetry else '关闭'),
             ('总进度', f'{spider.finished_count} / {spider.taskCount}', '跳过已收藏', spider.skip_comment_count),
             ('评论成功量', spider.success_count, '评论失败量', spider.failure_count),

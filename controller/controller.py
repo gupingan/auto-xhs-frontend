@@ -97,7 +97,7 @@ class Controller:
                         printc('系统：', BLUE, end='')
                         return print('已退出程序')
                 elif option == '1':
-                    self.spider_config()
+                    self.set_spider()
                 elif option == '2':
                     self.add_spider()
                 elif option == '3':
@@ -145,7 +145,10 @@ class Controller:
         os.system('cls')
         return func()
 
-    def spider_config(self):
+    def set_spider(self):
+        """
+        11月16日：增加新的设置项，生僻字模式，不同模式指向不同的引擎
+        """
         config_items, length = self.view.show_spider_config()
         print("请输入序号选择配置项，输入q或者回车返回上一级")
         while True:
@@ -161,7 +164,7 @@ class Controller:
                 value = inputc(f'[{self.user.username}/进程配置]({config_items[option][3]})$ ')
                 if not value or value.lower() == 'n':
                     continue
-                elif option in (0, 5, 8, 9, 10, 11, 12, 13, 14, 16, 17, 20):
+                elif option in (0, 5, 8, 9, 10, 11, 12, 13, 14, 17, 18, 21):
                     value = bool(value == '1' or value == '开启')
                     if option == 12:
                         if value == self.user.settings.get(config_items[13][0], config_items[13][1]) is True:
@@ -171,22 +174,22 @@ class Controller:
                         if value == self.user.settings.get(config_items[12][0], config_items[12][1]) is True:
                             printc('系统：不能与`跳过已收藏`共同设置为开启，这是无意义的行为', RED)
                             continue
-                    if option in (12, 13, 14, 16, 17):
+                    if option in (12, 13, 14, 17, 18):
                         if not self.user.settings.get(config_items[11][0], config_items[11][1]):
                             printc('系统：使用某些设置前先必须保证`是否评论`开启', RED)
                             continue
-                    if option == 17 and value is True:
-                        if not self.user.settings.get(config_items[16][0], config_items[16][1]):
+                    if option == 18 and value is True:
+                        if not self.user.settings.get(config_items[17][0], config_items[17][1]):
                             printc('系统：使用`屏蔽重试`前先必须保证`检查屏蔽开启`开启', RED)
                             continue
-                elif option in (2, 3):
+                elif option in (2, 3, 16):
                     items = config_items[option][3].split('|')
                     if value.isdigit() and 0 <= int(value) < len(items):
                         value = items[int(value)].split(' ')[-1]
                     else:
                         printc('系统：输入不规范，配置失败', RED)
                         continue
-                elif option in (4, 6, 7, 15, 18, 19):
+                elif option in (4, 6, 7, 15, 19, 20):
                     if not value.isdigit():
                         printc('系统：输入不规范，配置失败', RED)
                         continue
@@ -202,13 +205,13 @@ class Controller:
                     if option == 15 and not (1 <= int(value) <= 99):
                         printc('系统：生僻字数量只能设置在[1-99]之间', RED)
                         continue
-                    if option == 18 and not (1 <= int(value) <= 9):
+                    if option == 19 and not (1 <= int(value) <= 9):
                         printc('系统：重试次数只能设置在[1-9]之间', RED)
                         continue
-                    if option == 19 and not (1 <= int(value) <= 999):
+                    if option == 20 and not (1 <= int(value) <= 999):
                         printc('系统：任务间隔时间只能设置在[1-999]之间', RED)
                         continue
-                elif option == 21:
+                elif option == 22:
                     if not Path(value.strip('"')).exists():
                         printc('系统：文件不存在，配置失败', RED)
                         continue
@@ -267,6 +270,7 @@ class Controller:
         """
         创建进程方法
         11月14日：不再使用主入口的异常处理，防止程序退出，而是用方法内的try-except进行处理
+        11月16日：修改 接口 地址 /api/spider/create
         :return:
         """
         try:
@@ -310,7 +314,7 @@ class Controller:
             if len(spider.tasks):
                 spider.tasks.append(EndTask())
             # 送进服务器
-            create_api = '/api/spider'
+            create_api = '/api/spider/create'
             gpa_s, gpa_t = getGPASign(self.user.settings.gpaKey, create_api)
             post_data = {
                 'count': len(Spiders),

@@ -5,8 +5,8 @@ from pathlib import Path
 class Settings:
     def __init__(self, defaults=None, filename='settings.ini'):
         self.gpaKey = '&71)26eb3h5j%6n*fk9%w*zvimf0ccl-2p9$ifo()n$pq!xyu9'
-        self.version_number = 6
-        self.version = '2.4'
+        self.version_number = 7
+        self.version = '2.5'
         self.xhsBaseURL = "https://www.xiaohongshu.com/explore/"
         self.buildWords = ('clear', 'cls', 'menu', 'main', 'home', 'exit',
                            'quit', 'log', 'show', 'note')
@@ -51,6 +51,7 @@ class Settings:
             'is-again-comment-collect': 'False',
             'is-random-rare-word': 'False',
             'rare-word-count': '1',
+            'rare-word-engine': 'append',
             'is-check-shield': 'True',
             'is-shield-retry': 'False',
             'retry-count': '3',
