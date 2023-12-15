@@ -5,8 +5,8 @@ from pathlib import Path
 class Settings:
     def __init__(self, defaults=None, filename='settings.ini'):
         self.gpaKey = '&71)26eb3h5j%6n*fk9%w*zvimf0ccl-2p9$ifo()n$pq!xyu9'
-        self.version_number = 7
-        self.version = '2.5'
+        self.version_number = 8
+        self.version = '2.6'
         self.xhsBaseURL = "https://www.xiaohongshu.com/explore/"
         self.buildWords = ('clear', 'cls', 'menu', 'main', 'home', 'exit',
                            'quit', 'log', 'show', 'note')
