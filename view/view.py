@@ -103,8 +103,8 @@ class View:
         for i, config_value in enumerate(config_values):
             if isinstance(config_value, bool):
                 config_values[i] = state[config_value]
-        config_values[21] = f"{View.truncate_string(Path(config_values[21]).name, 24)}" if Path(
-            config_values[21]).exists() else '不合法文件'
+        config_values[-1] = f"{View.truncate_string(Path(config_values[-1]).name, 24)}" if Path(
+            config_values[-1]).exists() else '不合法文件'
         configs = zip(config_meanings, config_values)
         headers = ('序号', '设置项', '值')
         print(tabulate(configs, headers=headers, showindex=True, tablefmt="fancy_grid"))
