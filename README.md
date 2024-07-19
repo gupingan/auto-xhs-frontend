@@ -1,6 +1,6 @@
 ## 自动化小红书 客户端
 
-该端仅为作者练手所开发，如需服务，请转至新的仓库[烤红薯开源版](https://github.com/gupingan/khs-pyside6)
+该端仅为作者练手所开发，如需更好的红薯服务，请转至新的仓库[烤红薯开源版](https://github.com/gupingan/khs-pyside6)
 
 > 本教程文档适配客户端版本：auto-xhs v2.5
 
